@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.29.3.0
+- [Updated] Updated ReSharper SDK to 2025.2.1.
+
 ## 3.28.1.0
 - [Updated] Updated ReSharper SDK to 2025.1.0.
 - [Fixed] Incorrect display of C# 9.0 records and record structs.
