@@ -1,21 +1,20 @@
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.VsIntegration.Shell;
+using JetBrains.Util.DevEnv;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation {
 
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	public class HighlighterIdProviderFactory {
 
 		private readonly uint _vsMajorVersion;
 
-		[NotNull]
-		public HighlighterIdProvider CreateProvider([NotNull] IContextBoundSettingsStore settings)
+		public HighlighterIdProvider CreateProvider(IContextBoundSettingsStore settings)
 			=> new HighlighterIdProvider(GetHighlighterIdSource(settings));
 
-		private HighlighterIdSource GetHighlighterIdSource([NotNull] IContextBoundSettingsStore settings) {
+		private HighlighterIdSource GetHighlighterIdSource(IContextBoundSettingsStore settings) {
 			if (settings.GetValue(HighlightingSettingsAccessor.IdentifierHighlightingEnabled))
 				return HighlighterIdSource.ReSharper;
 			if (_vsMajorVersion >= 16u)
@@ -25,9 +24,8 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation {
 			return HighlighterIdSource.VisualStudioLegacy;
 		}
 
-		public HighlighterIdProviderFactory([NotNull] IVsEnvironmentInformation vsEnvironment) {
-			_vsMajorVersion = vsEnvironment.VsVersion2.Major;
-		}
+		public HighlighterIdProviderFactory(IVsEnvironmentInformation vsEnvironment)
+			=> _vsMajorVersion = vsEnvironment.VsVersion2.Major;
 
 	}
 

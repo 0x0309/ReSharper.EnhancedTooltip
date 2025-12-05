@@ -1,21 +1,19 @@
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeAnnotations;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 	
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	internal sealed class CircularTypeDependencyErrorEnhancer : CSharpHighlightingEnhancer<CircularTypeDependencyError> {
 
 		protected override void AppendTooltip(CircularTypeDependencyError highlighting, CSharpColorizer colorizer) {
 			IClassLikeDeclaration declaration = highlighting.Declaration;
-			ITypeElement declaredElement = declaration.DeclaredElement;
-			if (declaredElement == null)
+			if (declaration.DeclaredElement is not { } declaredElement)
 				return;
 
 			colorizer.AppendPlainText("Circular ");
@@ -28,9 +26,9 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 		}
 		
 		public CircularTypeDependencyErrorEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 

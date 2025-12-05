@@ -1,32 +1,52 @@
-<Project Sdk="MSBuild.Sdk.Extras/1.6.68">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
 		<AssemblyName>GammaJul.ReSharper.EnhancedTooltip</AssemblyName>
 		<RootNamespace>GammaJul.ReSharper.EnhancedTooltip</RootNamespace>
-		<TargetFramework>net461</TargetFramework>
+		<TargetFramework>net472</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<MSBuildWarningsAsMessages>MSB3277</MSBuildWarningsAsMessages>
 		<OutputPath>..\..\output\$(Configuration)</OutputPath>
-		<LangVersion>7.3</LangVersion>
-		<ExtrasEnableWpfProjectSetup>true</ExtrasEnableWpfProjectSetup>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<UserSecretsId>c45f04a1-d5d4-4d62-a6ab-51724e0ace93</UserSecretsId>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<Reference Include="System.Windows.Forms" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.ReSharper.SDK" Version="2019.1.0" />
-		<!-- Obtain version from https://api.nuget.org/v3/flatcontainer/jetbrains.platform.visualstudio/index.json -->
-		<PackageReference Include="JetBrains.Platform.VisualStudio" Version="191.0.20190429.185153" />
+		<PackageReference Include="JetBrains.ReSharper.SDK" Version="2025.2.1" />
 		<PackageReference Include="EnvDTE" Version="8.0.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="15.8.525" />
 		<PackageReference Include="VSSDK.Editor" Version="11.0.*" />
 		<PackageReference Include="VSSDK.Language" Version="11.0.*" />
 		<PackageReference Include="VSSDK.Shell.Immutable.11" Version="11.0.*" />
 		<PackageReference Include="VSSDK.Text" Version="11.0.*" />
-		<PackageReference Include="NuGet.CommandLine" Version="4.6.2" />
+		<PackageReference Include="NuGet.CommandLine" Version="6.0.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\Settings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>

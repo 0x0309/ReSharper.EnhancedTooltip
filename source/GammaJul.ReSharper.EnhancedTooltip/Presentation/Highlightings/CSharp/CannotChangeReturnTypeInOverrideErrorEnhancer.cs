@@ -1,6 +1,6 @@
 using System;
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Psi.CodeAnnotations;
@@ -8,12 +8,12 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	internal sealed class CannotChangeReturnTypeInOverrideErrorEnhancer : CSharpHighlightingEnhancer<CannotChangeReturnTypeInOverrideError> {
 
 		protected override void AppendTooltip(CannotChangeReturnTypeInOverrideError highlighting, CSharpColorizer colorizer) {
 			if (highlighting.TypeUsageMismatch.HasShortDescription) {
-				colorizer.AppendPlainText(highlighting.TypeUsageMismatch.GetDescription());
+				colorizer.AppendRichTextToText(highlighting.TypeUsageMismatch.GetDescription());
 				colorizer.AppendPlainText(Environment.NewLine);
 				colorizer.AppendPlainText(Environment.NewLine);
 			}
@@ -25,9 +25,9 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 		}
 		
 		public CannotChangeReturnTypeInOverrideErrorEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 

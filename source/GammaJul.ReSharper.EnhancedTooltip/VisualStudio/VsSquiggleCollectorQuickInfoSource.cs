@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application.Threading;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.Util;
 using Microsoft.VisualStudio.Language.Intellisense;
@@ -14,17 +16,17 @@ namespace GammaJul.ReSharper.EnhancedTooltip.VisualStudio {
 
 		protected override void AugmentQuickInfoSessionCore(
 			IQuickInfoSession session,
-			IList<object> quickInfoContent,
+			IList<object?> quickInfoContent,
 			IDocumentMarkup documentMarkup,
 			TooltipFormattingProvider tooltipFormattingProvider,
-			out ITrackingSpan applicableToSpan) {
+			out ITrackingSpan? applicableToSpan) {
 
 			applicableToSpan = null;
 
 			session.StoreVsSquiggleContents(quickInfoContent.ToArray());
 		}
 		
-		public VsSquiggleCollectorQuickInfoSource([NotNull] ITextBuffer textBuffer)
+		public VsSquiggleCollectorQuickInfoSource(ITextBuffer textBuffer)
 			: base(textBuffer) {
 		}
 

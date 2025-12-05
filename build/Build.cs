@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Nuke.Common;
 using Nuke.Common.Execution;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.MSBuild;
@@ -19,17 +20,19 @@ using static Nuke.Common.Tools.NuGet.NuGetTasks;
 [CheckBuildProjectConfigurations]
 internal class Build : NukeBuild {
 
-	/// Support plugins are available for:
-	/// - JetBrains ReSharper        https://nuke.build/resharper
-	/// - JetBrains Rider            https://nuke.build/rider
-	/// - Microsoft VisualStudio     https://nuke.build/visualstudio
-	/// - Microsoft VSCode           https://nuke.build/vscode
+	// Support plugins are available for:
+	// - JetBrains ReSharper        https://nuke.build/resharper
+	// - JetBrains Rider            https://nuke.build/rider
+	// - Microsoft VisualStudio     https://nuke.build/visualstudio
+	// - Microsoft VSCode           https://nuke.build/vscode
 
-	[Parameter] public readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+	public const string Debug = "Debug";
+	public const string Release = "Release";
+
+	[Parameter] public readonly string Configuration = IsLocalBuild ? Debug : Release;
 	[Parameter] public readonly string NuGetSource = "https://plugins.jetbrains.com/";
-	[Parameter] public readonly string NuGetApiKey;
-
-	[Solution] private readonly Solution _solution;
+	[Parameter] public readonly string NuGetApiKey = null!;
+	[Solution] public readonly Solution Solution = null!;
 
 	private const string MainProjectName = "GammaJul.ReSharper.EnhancedTooltip";
 
@@ -49,7 +52,7 @@ internal class Build : NukeBuild {
 		=> _ => _
 			.Executes(() => {
 				MSBuild(s => s
-					.SetTargetPath(_solution)
+					.SetTargetPath(Solution)
 					.SetTargets("Restore"));
 			});
 
@@ -58,7 +61,7 @@ internal class Build : NukeBuild {
 			.DependsOn(Restore)
 			.Executes(() => {
 				MSBuild(s => s
-					.SetTargetPath(_solution)
+					.SetTargetPath(Solution)
 					.SetTargets("Rebuild")
 					.SetConfiguration(Configuration)
 					.SetMaxCpuCount(Environment.ProcessorCount)
@@ -74,6 +77,9 @@ internal class Build : NukeBuild {
 				var releaseNotes = GetReleaseNotes();
 				var wave = GetWaveVersion();
 
+				if (Configuration.Equals(Debug))
+					version += "-pre";
+
 				NuGetPack(s => s
 					.SetTargetPath(MainProjectDirectory / (MainProjectName + ".nuspec"))
 					.SetBasePath(MainProjectDirectory)
@@ -82,7 +88,7 @@ internal class Build : NukeBuild {
 					.SetProperty("currentyear", currentYear)
 					.SetProperty("releasenotes", releaseNotes)
 					.SetProperty("wave", wave)
-					.SetProperty("configuration", Configuration.ToString())
+					.SetProperty("configuration", Configuration)
 					.EnableNoPackageAnalysis());
 			});
 
@@ -90,7 +96,7 @@ internal class Build : NukeBuild {
 		=> _ => _
 			.DependsOn(Pack)
 			.Requires(() => NuGetApiKey)
-			.Requires(() => Configuration.Release.Equals(Configuration))
+			.Requires(() => Release.Equals(Configuration))
 			.Executes(() => {
 				GlobFiles(OutputDirectory, "*.nupkg")
 					.ForEach(x => NuGetPush(s => s
@@ -99,12 +105,13 @@ internal class Build : NukeBuild {
 						.SetApiKey(NuGetApiKey)));
 			});
 
-	private string GetReleaseVersion()
-		=> File.ReadAllLines(MainProjectDirectory / "Properties/AssemblyInfo.cs")
+	private string? GetReleaseVersion()
+		=> File.ReadAllLines(MainProjectDirectory / "Properties" / "AssemblyInfo.cs")
 			.Select(x => Regex.Match(x, @"^\[assembly: AssemblyVersion\(""([^""]*)""\)\]$"))
 			.Where(x => x.Success)
 			.Select(x => x.Groups[1].Value)
-			.FirstOrDefault();
+			.FirstOrDefault()
+			.NotNull("Couldn't find assembly version");
 
 	private static string GetReleaseNotes()
 		=> File.ReadAllLines(RootDirectory / "CHANGELOG.md")
@@ -116,8 +123,10 @@ internal class Build : NukeBuild {
 
 	private string GetWaveVersion()
 		=> NuGetPackageResolver.GetLocalInstalledPackages(MainProjectDirectory / (MainProjectName + ".csproj"))
-			.SingleOrDefault(x => x.Id == "Wave")
-			.NotNull("fullWaveVersion != null")
+			.Where(x => x.Id.EqualsOrdinalIgnoreCase("Wave"))
+			.OrderByDescending(x => x.Version.Version)
+			.FirstOrDefault()
+			.NotNull("Couldn't find Wave version")!
 			.Version
 			.Version
 			.ToString(2);

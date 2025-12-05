@@ -20,15 +20,15 @@ namespace GammaJul.ReSharper.EnhancedTooltip.ParameterInfo {
 	[ParameterInfoContextFactory(typeof(CSharpLanguage))]
 	public class EnhancedParameterInfoContextFactory : CSParameterInfoContextFactory, IParameterInfoContextFactory {
 
-		public new IParameterInfoContext CreateContext(
+		public new IParameterInfoContext? CreateContext(
 			ISolution solution,
 			DocumentOffset caretOffset,
 			DocumentOffset expectedLParenthOffset,
 			char invocationChar,
 			IContextBoundSettingsStore settingsStore) {
 
-			IParameterInfoContext context = base.CreateContext(solution, caretOffset, expectedLParenthOffset, invocationChar, settingsStore);
-			if (!context.CanEnhance(settingsStore))
+			IParameterInfoContext? context = base.CreateContext(solution, caretOffset, expectedLParenthOffset, invocationChar, settingsStore);
+			if (context is null || !settingsStore.GetValue((Settings.ParameterInfoSettings s) => s.Enabled))
 				return context;
 
 			return new EnhancedParameterInfoContext(

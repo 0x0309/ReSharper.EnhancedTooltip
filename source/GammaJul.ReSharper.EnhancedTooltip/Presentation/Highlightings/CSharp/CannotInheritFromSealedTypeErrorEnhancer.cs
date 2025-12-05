@@ -1,5 +1,5 @@
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Psi;
@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi.CodeAnnotations;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	internal sealed class CannotInheritFromSealedTypeErrorEnhancer : CSharpHighlightingEnhancer<CannotInheritFromSealedTypeError> {
 
 		protected override void AppendTooltip(CannotInheritFromSealedTypeError highlighting, CSharpColorizer colorizer) {
@@ -21,9 +21,9 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 		}
 		
 		public CannotInheritFromSealedTypeErrorEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 

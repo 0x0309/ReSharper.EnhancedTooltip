@@ -13,7 +13,7 @@
 	<!-- Style for VS listbox item's data inside the tooltip, for VS < 15.6 -->
 	<DataTemplate x:Key="LegacyQuickInfoItemDataTemplate">
 		<Border
-			BorderThickness="1"
+			BorderThickness="0"
 			BorderBrush="{Binding Path=(local:Styling.ItemTemplateBorderBrush), RelativeSource={RelativeSource Self}}"
 			Background="{Binding Path=(local:Styling.ItemTemplateBackground), RelativeSource={RelativeSource Self}}">
 			<!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
@@ -24,7 +24,7 @@
 	<!-- Style for VS listbox item's data inside the tooltip, for VS >= 15.6 -->
 	<DataTemplate x:Key="QuickInfoItemDataTemplate">
 		<Border
-			BorderThickness="1"
+			BorderThickness="0"
 			BorderBrush="{Binding Path=(local:Styling.ItemTemplateBorderBrush), RelativeSource={RelativeSource Self}}"
 			Background="{Binding Path=(local:Styling.ItemTemplateBackground), RelativeSource={RelativeSource Self}}">
 			<ContentPresenter Content="{Binding}" Margin="8,6" />
@@ -38,7 +38,7 @@
 
 	<!-- Style for VS listbox inside the tooltip -->
 	<Style x:Key="QuickInfoListBoxStyle" TargetType="{x:Type ItemsControl}">
-		<Setter Property="BorderThickness" Value="0" />
+		<Setter Property="BorderThickness" Value="1" />
 		<Setter Property="BorderBrush" Value="{Binding PresenterStyle.BorderBrush}" />
 		<Setter Property="Background" Value="Transparent" />
 		<Setter Property="FontFamily" Value="{DynamicResource {x:Static SystemFonts.StatusFontFamilyKey}}" />
@@ -64,7 +64,7 @@
 
 	<!-- Style for a "group" inside the tooltip" -->
 	<Style x:Key="HeaderedContentControlStyle" TargetType="{x:Type HeaderedContentControl}">
-		<Style.Resources>
+    <Style.Resources>
 
 			<local:DescriptionSeparatorWidthConverter x:Key="DescriptionSeparatorWidthConverter" />
 			<local:StringToWrappedTextBlockConverter x:Key="StringToWrappedTextBlockConverter" />
@@ -153,6 +153,34 @@
 							RichText="{Binding Description}" />
 					</StackPanel>
 
+					<ItemsControl x:Name="ParametersPresenter" ItemsSource="{Binding Parameters}" Grid.IsSharedSizeScope="True">
+						<ItemsControl.ItemTemplate>
+							<DataTemplate DataType="{x:Type richText:RichText}">
+
+								<DockPanel Margin="0,2,0,0">
+									<StackPanel Orientation="Horizontal" VerticalAlignment="Top" DockPanel.Dock="Left">
+										<Border BorderBrush="Gray" BorderThickness="1" Margin="0,0,4,0" VerticalAlignment="Center">
+											<TextBlock x:Name="txtLabel" Style="{StaticResource TitleTextBlockStyle}" Text="Parameter"
+											           FontSize="{Binding Path=(TextElement.FontSize), ElementName=Root, Converter={StaticResource SmallFontSizeConverter}}" />
+										</Border>
+                    <local:AutoContrastedRichTextPresenter TextWrapping="Wrap" VerticalAlignment="Center"
+                                                           RichText="{Binding Name}" Margin="0,0,0,1" />
+										<TextBlock Text=" • " FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,0,1" />
+									</StackPanel>
+
+									<local:AutoContrastedRichTextPresenter TextWrapping="Wrap" VerticalAlignment="Center"
+									                                       RichText="{Binding Description}" Margin="0,0,0,1" />
+
+								</DockPanel>
+								<DataTemplate.Triggers>
+									<DataTrigger Binding="{Binding IsTypeParameter}" Value="true">
+										<Setter TargetName="txtLabel" Property="Text" Value="Type param" />
+									</DataTrigger>
+								</DataTemplate.Triggers>
+							</DataTemplate>
+						</ItemsControl.ItemTemplate>
+					</ItemsControl>
+
 					<DockPanel x:Name="ObsoletePresenter" Margin="0,2,0,0">
 						<Border Style="{StaticResource TitleBorderStyle}" DockPanel.Dock="Left">
 							<TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Obsolete"
@@ -199,7 +227,7 @@
 											<TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Throws"
 												FontSize="{Binding Path=(TextElement.FontSize), ElementName=Root, Converter={StaticResource SmallFontSizeConverter}}" />
 										</Border>
-										<TextBlock Text="{Binding Exception}" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,0,1" />
+                    <local:AutoContrastedRichTextPresenter TextWrapping="Wrap" VerticalAlignment="Center" RichText="{Binding Exception}" Margin="0,0,0,1" />
 										<TextBlock Text=" → " FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,0,1" />
 									</StackPanel>
 
@@ -248,6 +276,9 @@
 					<DataTrigger Binding="{Binding HasItems, ElementName=ExceptionsPresenter}" Value="False">
 						<Setter TargetName="ExceptionsPresenter" Property="Visibility" Value="Collapsed" />
 					</DataTrigger>
+					<DataTrigger Binding="{Binding HasItems, ElementName=ParametersPresenter}" Value="False">
+						<Setter TargetName="ParametersPresenter" Property="Visibility" Value="Collapsed" />
+					</DataTrigger>
 					<DataTrigger Binding="{Binding Description}" Value="{x:Null}">
 						<Setter TargetName="DescriptionPresenter" Property="Visibility" Value="Collapsed" />
 					</DataTrigger>
@@ -257,6 +288,7 @@
 							<Condition Binding="{Binding Return}" Value="{x:Null}" />
 							<Condition Binding="{Binding Remarks}" Value="{x:Null}" />
 							<Condition Binding="{Binding HasItems, ElementName=ExceptionsPresenter}" Value="False" />
+							<Condition Binding="{Binding HasItems, ElementName=ParametersPresenter}" Value="False" />
 						</MultiDataTrigger.Conditions>
 						<Setter TargetName="DescriptionPresenter" Property="Margin" Value="0" />
 					</MultiDataTrigger>
@@ -297,7 +329,7 @@
 
 			<!-- Style for an issue -->
 			<DataTemplate DataType="{x:Type local:IssueTooltipContent}">
-				<DockPanel Margin="0,1">
+        <DockPanel Margin="0,1">
 					<Border DataContext="{Binding Icon}">
 						<jui:ThemedIconViewImage x:Name="IconPresenter" Stretch="Uniform"
 							Margin="0,0,4,0" local:IconScaling.IsScalingWithFontSize="True"
@@ -341,6 +373,11 @@
 				<ContentPresenter Content="{Binding Content}" Margin="0,1" />
 			</DataTemplate>
 
+			<!-- Style for VS non C# content -->
+			<DataTemplate DataType="{x:Type local:NonCSharpTooltipContent}">
+				<ContentPresenter Content="{Binding Content}" Margin="0,1" />
+			</DataTemplate>
+
 		</Style.Resources>
 
 		<Setter Property="Margin" Value="0" />
@@ -348,7 +385,20 @@
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type HeaderedContentControl}">
-					<ContentPresenter />
+          <Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ContentPresenter Grid.Row="0" />
+            <local:DashedSeparator x:Name="separator" Grid.Row="1" StrokeThickness="1" StrokeDashArray="3,3" Margin="-8,6,-8,-6" RenderOptions.EdgeMode="Aliased"
+                                   Stroke="{Binding Path=(local:Styling.ItemTemplateBorderBrush), RelativeSource={RelativeSource Self}}" />
+          </Grid>
+            <ControlTemplate.Triggers>
+							<Trigger Property="Tag" Value="Last">
+								<Setter TargetName="separator" Property="Visibility" Value="Collapsed"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>

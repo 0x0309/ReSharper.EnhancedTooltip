@@ -1,15 +1,15 @@
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Psi.CodeAnnotations;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 
-	[SolutionComponent]
-	internal sealed class ConvertIfStatementToSwitchStatementWarningEnhancer : CSharpHighlightingEnhancer<ConvertIfStatementToSwitchStatementWarning> {
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
+	internal sealed class ConvertIfStatementToSwitchStatementWarningEnhancer : CSharpHighlightingEnhancer<ConvertIfStatementToSwitchWarning> {
 
-		protected override void AppendTooltip(ConvertIfStatementToSwitchStatementWarning highlighting, CSharpColorizer colorizer) {
+		protected override void AppendTooltip(ConvertIfStatementToSwitchWarning highlighting, CSharpColorizer colorizer) {
 			colorizer.AppendPlainText("Convert '");
 			colorizer.AppendKeyword("if");
 			colorizer.AppendPlainText("' statement to '");
@@ -18,9 +18,9 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 		}
 		
 		public ConvertIfStatementToSwitchStatementWarningEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 

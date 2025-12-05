@@ -1,5 +1,5 @@
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Psi.CodeAnnotations;
@@ -7,23 +7,23 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	internal sealed class CannotOverrideNonExistingAccessorErrorEnhancer : CSharpHighlightingEnhancer<CannotOverrideNonExistingAccessorError> {
 
 		protected override void AppendTooltip(CannotOverrideNonExistingAccessorError highlighting, CSharpColorizer colorizer) {
 			colorizer.AppendPlainText("'");
-			colorizer.TryAppendDeclaredElement(highlighting.ExtraAccessor.DeclaredElement, EmptySubstitution.INSTANCE, PresenterOptions.NameOnly, highlighting.ExtraAccessor);
+			colorizer.TryAppendDeclaredElement(highlighting.ExtraAccessor, EmptySubstitution.INSTANCE, PresenterOptions.NameOnly, highlighting.Declaration);
 			colorizer.AppendPlainText("': cannot override because '");
-			colorizer.AppendDeclaredElement(highlighting.OverriddenMember, EmptySubstitution.INSTANCE, PresenterOptions.QualifiedMember, highlighting.ExtraAccessor);
+			colorizer.AppendDeclaredElement(highlighting.OverriddenMember, EmptySubstitution.INSTANCE, PresenterOptions.QualifiedMember, highlighting.Declaration);
 			colorizer.AppendPlainText("' does not have an overridable ");
 			colorizer.AppendAccessorKind(highlighting.ExtraAccessor.Kind);
 			colorizer.AppendPlainText(" accessor");
 		}
-		
+
 		public CannotOverrideNonExistingAccessorErrorEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 

@@ -1,5 +1,5 @@
 using GammaJul.ReSharper.EnhancedTooltip.DocumentMarkup;
-using JetBrains.Annotations;
+using JetBrains.Application.Parts;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Daemon.CSharp.Errors;
 using JetBrains.ReSharper.Psi;
@@ -8,14 +8,14 @@ using JetBrains.ReSharper.Psi.Resolve;
 
 namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 
-	[SolutionComponent]
+	[SolutionComponent(Instantiation.ContainerAsyncAnyThreadUnsafe)]
 	internal sealed class ClassIsAbstractAndSealedErrorEnhancer : CSharpHighlightingEnhancer<ClassIsAbstractAndSealedError> {
 
 		protected override void AppendTooltip(ClassIsAbstractAndSealedError highlighting, CSharpColorizer colorizer) {
-			ITypeElement declaredElement = highlighting.ClassDeclaration.DeclaredElement;
+			ITypeElement? declaredElement = highlighting.ClassDeclaration.DeclaredElement;
 
 			colorizer.AppendPlainText("Class '");
-			if (declaredElement != null)
+			if (declaredElement is not null)
 				colorizer.AppendDeclaredElement(declaredElement, EmptySubstitution.INSTANCE, PresenterOptions.QualifiedName, highlighting.ClassDeclaration);
 			else
 				colorizer.AppendClassName(highlighting.ClassDeclaration.DeclaredName);
@@ -26,9 +26,9 @@ namespace GammaJul.ReSharper.EnhancedTooltip.Presentation.Highlightings.CSharp {
 		}
 		
 		public ClassIsAbstractAndSealedErrorEnhancer(
-			[NotNull] TextStyleHighlighterManager textStyleHighlighterManager,
-			[NotNull] CodeAnnotationsConfiguration codeAnnotationsConfiguration,
-			[NotNull] HighlighterIdProviderFactory highlighterIdProviderFactory)
+			TextStyleHighlighterManager textStyleHighlighterManager,
+			CodeAnnotationsConfiguration codeAnnotationsConfiguration,
+			HighlighterIdProviderFactory highlighterIdProviderFactory)
 			: base(textStyleHighlighterManager, codeAnnotationsConfiguration, highlighterIdProviderFactory) {
 		}
 
